@@ -1,0 +1,89 @@
+version: '3'
+services:
+  manager:
+    image: hub.deepin.com/wuhan_udcp/otter-manager:amd64
+    environment:
+      - DOMAIN_NAME=10.20.23.147
+      - HTTP_PORT=8080
+    ports:
+      - "8080:8080"
+      - "1099:1099"
+    volumes:
+      - ./otter-manager/logs:/otter-manager/logs
+      - ./otter-manager/conf/otter.properties:/otter-manager/conf/otter.properties
+    depends_on:
+      - mysql
+      - zk
+  node:
+    image: hub.deepin.com/wuhan_udcp/otter-node:amd64
+    environment:
+      - MANAGER_ADDRESS=10.20.23.147:1099
+      - NID=1
+    ports:
+      - "2088:2088"
+      - "2090:2090"
+      - "9092:9092"
+    volumes:
+      - ./otter-node/logs:/otter-node/logs
+      - ./otter-node/data/download:/otter-node/download
+      - ./otter-node/data/extend:/otter-node/extend
+      - ./otter-node/data/htdocs:/otter-node/htdocs
+      - ./otter-node/conf/otter.properties:/otter-node/conf/otter.properties
+      - ./otter-node/conf/nid:/otter-node/conf/nid
+    depends_on:
+      - manager
+  zk:
+    image: zookeeper:3.5.9
+    restart: always
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    volumes:
+      - ./zk/data:/data/zookeeper
+      - ./zk/log:/var/log/zookeeper
+  mysql:
+    image: mysql:5.7.35
+    privileged: true
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=otter
+      - MYSQL_USER=uos
+      - MYSQL_PASSWORD=123456
+    volumes:
+#      - ./mysql/init.d:/docker-entrypoint-initdb.d/
+#      - ./mysql/conf.d/mysql.conf:/etc/mysql/my.cnf
+      - ./mysql/data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  mysql_1:
+    image: mysql:5.7.35
+    privileged: true
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=otter
+      - MYSQL_USER=uos
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - ./mysql_1/init.d:/docker-entrypoint-initdb.d/
+      - ./mysql_1/conf.d/mysql.conf:/etc/mysql/my.cnf
+      - ./mysql_1/data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  mysql_2:
+    image: mysql:5.7.35
+    privileged: true
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=otter
+      - MYSQL_USER=uos
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - ./mysql_2/init.d:/docker-entrypoint-initdb.d/
+      - ./mysql_2/conf.d/mysql.conf:/etc/mysql/my.cnf
+      - ./mysql_2/data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
