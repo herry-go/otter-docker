@@ -15,5 +15,5 @@
 通过 Zookeeper 实现高可用。
 
 ## 2.基础镜像
-jdk8后期统一使用公司的通用基础镜像：hub.deepin.com/public/oracle-jdk:8
+jdk8统一基础镜像：hub.deepin.com/public/oracle-jdk:8
 
